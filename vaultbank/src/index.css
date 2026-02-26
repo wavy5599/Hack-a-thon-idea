@@ -1,0 +1,28 @@
+/* index.css — keep global styles minimal so App.css can control layout */
+
+:root {
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* key: allow full-height layouts */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: transparent; /* App.css handles background */
+}
+
+/* links/buttons: let App.css style these */
+a { color: inherit; text-decoration: none; }
+button { font: inherit; }
