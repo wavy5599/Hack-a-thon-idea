@@ -1,28 +1,50 @@
-// src/pages/SignIn.tsx
-import "../pages/signin.css";
+// src/pages/CreateAccount.tsx
 import React, { useMemo, useState } from "react";
+import "./signin.css";
 
 type Props = {
   brandName?: string;
-  onSubmit?: (payload: { email: string; password: string; remember: boolean }) => void;
+  onSubmit?: (payload: {
+    fullName: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    agree: boolean;
+  }) => void;
 };
 
-export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
+export default function CreateAccount({ brandName = "vaultbank", onSubmit }: Props) {
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(true);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [agree, setAgree] = useState(false);
   const [showPw, setShowPw] = useState(false);
+
+  const pwMatch = password.length > 0 && password === confirmPassword;
 
   const canSubmit = useMemo(() => {
     const e = email.trim();
-    return e.length > 3 && e.includes("@") && password.length >= 6;
-  }, [email, password]);
+    return (
+      fullName.trim().length >= 2 &&
+      e.length > 3 &&
+      e.includes("@") &&
+      password.length >= 6 &&
+      pwMatch &&
+      agree
+    );
+  }, [fullName, email, password, pwMatch, agree]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const payload = { email: email.trim(), password, remember };
+    const payload = {
+      fullName: fullName.trim(),
+      email: email.trim(),
+      password,
+      confirmPassword,
+      agree,
+    };
     onSubmit?.(payload);
-    // demo: no navigation here; wire this up in your app/router
   }
 
   return (
@@ -38,31 +60,30 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
             </div>
           </div>
 
-          <h1 className="h1 glow">welcome back.</h1>
+          <h1 className="h1 glow">create your account.</h1>
           <p className="lead">
-            sign in to manage balances, track activity, and ship your hackathon demo with a clean,
-            modern UI.
+            spin up a demo login fast now, then swap in real auth when you’re ready.
           </p>
 
           <div className="authTrust">
             <div className="stat">
+              <div className="statValue">KYC</div>
+              <div className="statLabel">later (optional)</div>
+            </div>
+            <div className="stat">
               <div className="statValue">2FA</div>
-              <div className="statLabel">ready when you are</div>
+              <div className="statLabel">add after MVP</div>
             </div>
             <div className="stat">
-              <div className="statValue">AES-256</div>
-              <div className="statLabel">at-rest encryption</div>
-            </div>
-            <div className="stat">
-              <div className="statValue">99.9%</div>
-              <div className="statLabel">uptime target</div>
+              <div className="statValue">safe</div>
+              <div className="statLabel">secure defaults</div>
             </div>
           </div>
 
           <div className="callout">
             <div className="callTitle">tip</div>
             <div className="sub">
-              keep your demo login simple: email + password, then plug in real auth later.
+              for hackathons: store users in-memory or a simple DB table and keep flows smooth.
             </div>
           </div>
         </section>
@@ -72,13 +93,29 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
           <div className="panel authPanel">
             <div className="panelTop">
               <div>
-                <div className="kicker">sign in</div>
-                <div className="balance">access your vault</div>
+                <div className="kicker">create account</div>
+                <div className="balance">join your vault</div>
               </div>
-              <span className="pill">secure</span>
+              <span className="pill">new</span>
             </div>
 
             <form className="authForm" onSubmit={handleSubmit}>
+              <label className="field">
+                <span className="fieldLabel">full name</span>
+                <div className="inputGroup">
+                  <span className="fieldIcon" aria-hidden="true">
+                    👤
+                  </span>
+                  <input
+                    type="text"
+                    autoComplete="name"
+                    placeholder="your name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                  />
+                </div>
+              </label>
+
               <label className="field">
                 <span className="fieldLabel">email</span>
                 <div className="inputGroup">
@@ -104,7 +141,7 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
                   </span>
                   <input
                     type={showPw ? "text" : "password"}
-                    autoComplete="current-password"
+                    autoComplete="new-password"
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -120,44 +157,65 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
                 </div>
               </label>
 
+              <label className="field">
+                <span className="fieldLabel">confirm password</span>
+                <div className="inputGroup">
+                  <span className="fieldIcon" aria-hidden="true">
+                    ✓
+                  </span>
+                  <input
+                    type={showPw ? "text" : "password"}
+                    autoComplete="new-password"
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                </div>
+              </label>
+
+              {/* small inline feedback using your existing typographic styles */}
+              {!pwMatch && confirmPassword.length > 0 && (
+                <div className="fineprint" style={{ marginTop: "-6px" }}>
+                  passwords must match
+                </div>
+              )}
+
               <div className="authRow">
                 <label className="checkRow">
-                  <input
-                    type="checkbox"
-                    checked={remember}
-                    onChange={(e) => setRemember(e.target.checked)}
-                  />
-                  <span>remember me</span>
+                  <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
+                  <span>
+                    i agree to the <a href="#">terms</a>
+                  </span>
                 </label>
 
                 <a className="mutedLink" href="#">
-                  forgot password?
+                  already have an account?
                 </a>
               </div>
 
               <div className="panelBtns">
                 <button className="btn primary" type="submit" disabled={!canSubmit}>
-                  sign in
+                  create account
                 </button>
                 <button className="btn" type="button">
-                  create account
+                  back to sign in
                 </button>
               </div>
 
               <p className="fineprint">
-                by continuing, you agree to our <a href="#">terms</a> and <a href="#">privacy</a>.
+                we’ll never share your info. this is a demo flow—wire up real auth when ready.
               </p>
             </form>
 
             <div className="txBox authFoot">
-              <div className="txTitle">recent activity (demo)</div>
+              <div className="txTitle">setup checklist (demo)</div>
 
               <div className="txRow">
                 <div className="txLeft">
-                  <div className="txIcon">↗</div>
+                  <div className="txIcon">✅</div>
                   <div className="txText">
-                    <div className="txMerchant">login attempt</div>
-                    <div className="kicker">device • web</div>
+                    <div className="txMerchant">account details</div>
+                    <div className="kicker">name + email</div>
                   </div>
                 </div>
                 <div className="txAmt pos">ok</div>
@@ -165,21 +223,21 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
 
               <div className="txRow">
                 <div className="txLeft">
-                  <div className="txIcon">🛡</div>
+                  <div className="txIcon">🔒</div>
                   <div className="txText">
-                    <div className="txMerchant">security check</div>
-                    <div className="kicker">token refreshed</div>
+                    <div className="txMerchant">password</div>
+                    <div className="kicker">min 6 chars</div>
                   </div>
                 </div>
-                <div className="txAmt pos">done</div>
+                <div className="txAmt pos">ready</div>
               </div>
 
               <div className="txRow">
                 <div className="txLeft">
                   <div className="txIcon">⚡</div>
                   <div className="txText">
-                    <div className="txMerchant">session</div>
-                    <div className="kicker">ready</div>
+                    <div className="txMerchant">next</div>
+                    <div className="kicker">route to dashboard</div>
                   </div>
                 </div>
                 <div className="txAmt">—</div>
