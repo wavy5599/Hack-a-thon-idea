@@ -1,5 +1,6 @@
 // src/pages/SignIn.tsx
 import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./signin.css";
 
 type Props = {
@@ -8,12 +9,14 @@ type Props = {
 };
 
 export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(true);
   const [showPw, setShowPw] = useState(false);
 
-  const [statusMsg, setStatusMsg] = useState<string>(""); // always renderable
+  const [statusMsg, setStatusMsg] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
   const validEmail = useMemo(() => {
@@ -31,7 +34,6 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    console.log("✅ Sign in clicked");
 
     if (!validEmail) {
       setStatusMsg("enter a valid email (must include @)");
@@ -55,14 +57,11 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
       });
 
       const text = await res.text();
-      console.log("status:", res.status, "raw:", text);
 
       let data: any = {};
       try {
         data = JSON.parse(text);
-      } catch {
-        // not json, keep raw text
-      }
+      } catch {}
 
       if (!res.ok) {
         setStatusMsg(data?.message ?? `login failed (${res.status})`);
@@ -71,6 +70,11 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
 
       setStatusMsg(data?.message ?? "login was successful ✅");
       onSubmit?.(payload);
+
+      // ✅ auto-route to dashboard after success
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 300);
     } catch (err) {
       console.error("❌ fetch failed:", err);
       setStatusMsg("could not reach java server (start it: java VaultBankServer)");
@@ -191,7 +195,6 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
                 </a>
               </div>
 
-              {/* always-visible feedback */}
               {statusMsg && <p className="fineprint">{statusMsg}</p>}
 
               <div className="panelBtns">
