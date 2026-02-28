@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Routes, Route, Link } from "react-router-dom";
-import SignIn from "./pages/SignIn";
+import SignIn from "./pages/Signin";
 import "./App.css";
 
 type Tx = {
