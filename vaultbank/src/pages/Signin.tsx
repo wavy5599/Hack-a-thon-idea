@@ -1,6 +1,6 @@
 // src/pages/SignIn.tsx
-import "../pages/signin.css";
 import React, { useMemo, useState } from "react";
+import "./signin.css";
 
 type Props = {
   brandName?: string;
@@ -13,22 +13,75 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
   const [remember, setRemember] = useState(true);
   const [showPw, setShowPw] = useState(false);
 
-  const canSubmit = useMemo(() => {
-    const e = email.trim();
-    return e.length > 3 && e.includes("@") && password.length >= 6;
-  }, [email, password]);
+  const [statusMsg, setStatusMsg] = useState<string>(""); // always renderable
+  const [isLoading, setIsLoading] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  const validEmail = useMemo(() => {
+    const e = email.trim();
+    return e.length > 3 && e.includes("@");
+  }, [email]);
+
+  const validPassword = useMemo(() => password.length >= 6, [password]);
+
+  const canSubmit = useMemo(() => validEmail && validPassword && !isLoading, [
+    validEmail,
+    validPassword,
+    isLoading,
+  ]);
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    console.log("✅ Sign in clicked");
+
+    if (!validEmail) {
+      setStatusMsg("enter a valid email (must include @)");
+      return;
+    }
+    if (!validPassword) {
+      setStatusMsg("password must be at least 6 characters");
+      return;
+    }
+
+    setStatusMsg("contacting server...");
+    setIsLoading(true);
+
     const payload = { email: email.trim(), password, remember };
-    onSubmit?.(payload);
-    // demo: no navigation here; wire this up in your app/router
+
+    try {
+      const res = await fetch("http://localhost:8080/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const text = await res.text();
+      console.log("status:", res.status, "raw:", text);
+
+      let data: any = {};
+      try {
+        data = JSON.parse(text);
+      } catch {
+        // not json, keep raw text
+      }
+
+      if (!res.ok) {
+        setStatusMsg(data?.message ?? `login failed (${res.status})`);
+        return;
+      }
+
+      setStatusMsg(data?.message ?? "login was successful ✅");
+      onSubmit?.(payload);
+    } catch (err) {
+      console.error("❌ fetch failed:", err);
+      setStatusMsg("could not reach java server (start it: java VaultBankServer)");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
     <main className="auth">
       <div className="authShell">
-        {/* Left: copy + trust */}
         <section className="authLeft">
           <div className="authBrand">
             <span className="dot" aria-hidden="true" />
@@ -67,7 +120,6 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
           </div>
         </section>
 
-        {/* Right: form */}
         <section className="authRight">
           <div className="panel authPanel">
             <div className="panelTop">
@@ -92,6 +144,7 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
                     placeholder="you@domain.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={isLoading}
                   />
                 </div>
               </label>
@@ -108,12 +161,14 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
                     className="btn ghost miniBtn"
                     onClick={() => setShowPw((v) => !v)}
                     aria-label={showPw ? "hide password" : "show password"}
+                    disabled={isLoading}
                   >
                     {showPw ? "hide" : "show"}
                   </button>
@@ -126,6 +181,7 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
                     type="checkbox"
                     checked={remember}
                     onChange={(e) => setRemember(e.target.checked)}
+                    disabled={isLoading}
                   />
                   <span>remember me</span>
                 </label>
@@ -135,12 +191,12 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
                 </a>
               </div>
 
+              {/* always-visible feedback */}
+              {statusMsg && <p className="fineprint">{statusMsg}</p>}
+
               <div className="panelBtns">
                 <button className="btn primary" type="submit" disabled={!canSubmit}>
-                  sign in
-                </button>
-                <button className="btn" type="button">
-                  create account
+                  {isLoading ? "signing in..." : "sign in"}
                 </button>
               </div>
 

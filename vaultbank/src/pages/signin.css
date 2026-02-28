@@ -1,0 +1,126 @@
+/* App.css (add at bottom) — Sign In page styles that inherit your existing tokens/buttons/panel */
+.auth {
+  width: 100%;
+  padding: 28px 0 36px;
+}
+
+.authShell {
+  padding: 0 var(--pad);
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.authLeft {
+  min-width: 0;
+  padding: 10px 10px 0 6px;
+}
+
+.authBrand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.authTrust {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.authRight {
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.authPanel {
+  max-width: 520px;
+  width: 100%;
+}
+
+.authForm {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  color: var(--muted2);
+  font-weight: 900;
+  text-transform: lowercase;
+  letter-spacing: 0.2px;
+}
+
+.fieldIcon {
+  opacity: 0.7;
+  font-weight: 950;
+}
+
+.miniBtn {
+  padding: 8px 10px;
+  border-radius: 12px;
+}
+
+.authRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.checkRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  user-select: none;
+}
+
+.checkRow input {
+  width: 16px;
+  height: 16px;
+  accent-color: rgba(120, 160, 255, 0.9);
+}
+
+.mutedLink {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 900;
+  opacity: 0.86;
+}
+
+.mutedLink:hover {
+  opacity: 1;
+}
+
+.authFoot {
+  margin-top: 12px;
+}
+
+/* responsive */
+@media (max-width: 980px) {
+  .authShell {
+    grid-template-columns: 1fr;
+  }
+  .authTrust {
+    grid-template-columns: 1fr;
+  }
+  .authRight {
+    justify-content: stretch;
+  }
+  .authPanel {
+    max-width: 680px;
+  }
+}
