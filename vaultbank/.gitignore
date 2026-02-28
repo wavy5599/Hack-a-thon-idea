@@ -25,4 +25,8 @@ dist-ssr
 
 
 # Compiled class files 
-.*.class
+*.class
+
+#env files
+.env
+.env.* 

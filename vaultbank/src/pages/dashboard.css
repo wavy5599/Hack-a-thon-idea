@@ -1,5 +1,7 @@
-/* src/pages/dashboard.css */
-/* self-contained dashboard styles: fully scoped to .dash, no dependency on other CSS */
+/* src/pages/dashboard.css
+   self-contained dashboard styles (scoped to .dash only)
+   matches Dashboard.tsx including vault ai panel
+*/
 
 /* -----------------------------
    scoped reset (only inside .dash)
@@ -10,78 +12,28 @@
 }
 
 .dash {
-  /* isolate from surrounding app styles */
   isolation: isolate;
   min-height: 100vh;
+  width: 100%;
+  margin: 0;
 
-  /* typography baseline (no inheritance needed) */
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
     "Apple Color Emoji", "Segoe UI Emoji";
   color: rgba(255, 255, 255, 0.92);
   line-height: 1.35;
 
-  /* spacing */
   padding: 18px;
 
-  /* background */
   background:
     radial-gradient(1100px 650px at 12% 18%, rgba(124, 77, 255, 0.22), transparent 55%),
     radial-gradient(900px 600px at 85% 30%, rgba(0, 212, 255, 0.16), transparent 55%),
     radial-gradient(700px 500px at 60% 90%, rgba(57, 255, 136, 0.08), transparent 60%),
     linear-gradient(180deg, #070913, #0b1024);
+
   overflow-x: hidden;
 
-  /* IMPORTANT: full width page */
-  width: 100%;
-  margin: 0;
-  border-radius: 10px;
-}
-
-/* centered content container (put your dashboard JSX inside this) */
-.dashInner {
-  width: 100%;
-  max-width: 1120px;
-  margin: 0 auto;
-}
-
-/* kill default margins inside dash */
-.dash h1,
-.dash h2,
-.dash h3,
-.dash p,
-.dash ul,
-.dash ol {
-  margin: 0;
-}
-
-/* links inside dash */
-.dash a {
-  color: rgba(255, 255, 255, 0.88);
-  text-decoration: none;
-}
-.dash a:hover {
-  text-decoration: underline;
-}
-
-/* buttons inside dash */
-.dash button {
-  font: inherit;
-  color: inherit;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-.dash button:disabled {
-  cursor: not-allowed;
-  opacity: 0.65;
-}
-
-/* -----------------------------
-   tokens (scoped)
------------------------------- */
-.dash {
+  /* scoped tokens */
   --vb-bg-card: rgba(255, 255, 255, 0.06);
-  --vb-bg-card-2: rgba(255, 255, 255, 0.085);
   --vb-border: rgba(255, 255, 255, 0.12);
   --vb-border-2: rgba(255, 255, 255, 0.16);
   --vb-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
@@ -96,6 +48,51 @@
 
   --vb-radius: 18px;
   --vb-radius-sm: 14px;
+}
+
+.dash h1,
+.dash h2,
+.dash h3,
+.dash p,
+.dash ul,
+.dash ol {
+  margin: 0;
+}
+
+.dash a {
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+}
+.dash a:hover {
+  text-decoration: underline;
+}
+
+.dash button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.dash button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* -----------------------------
+   inner container
+------------------------------ */
+.dashInner {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+
+  min-height: calc(100vh - 36px); /* 18 top + 18 bottom padding */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  padding-top: 10px;
 }
 
 /* -----------------------------
@@ -137,7 +134,7 @@
 }
 
 /* -----------------------------
-   responsive grid
+   grid
 ------------------------------ */
 .dashGrid {
   display: grid;
@@ -145,7 +142,6 @@
   gap: 14px;
 }
 
-/* tablet+ : two columns */
 @media (min-width: 860px) {
   .dashGrid {
     grid-template-columns: 1.05fr 0.95fr;
@@ -154,7 +150,7 @@
 }
 
 /* -----------------------------
-   panel system (self-contained)
+   panels
 ------------------------------ */
 .panel {
   background: var(--vb-bg-card);
@@ -164,6 +160,7 @@
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   padding: 16px;
+  margin-top: 6px;
 }
 
 .panelTop {
@@ -180,6 +177,7 @@
   letter-spacing: -0.02em;
 }
 
+/* pill */
 .pill {
   position: relative;
   overflow: hidden;
@@ -188,7 +186,7 @@
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.14);
-  color: rgba(255, 255, 255, 0.90);
+  color: rgba(255, 255, 255, 0.9);
   white-space: nowrap;
 }
 
@@ -219,7 +217,7 @@
 }
 
 /* -----------------------------
-   buttons (self-contained, scoped)
+   buttons
 ------------------------------ */
 .btn {
   display: inline-flex;
@@ -243,7 +241,7 @@
 .btn:hover {
   transform: translateY(-1px);
   background: rgba(255, 255, 255, 0.085);
-  border-color: rgba(255, 255, 255, 0.20);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .btn:active {
@@ -270,7 +268,7 @@
 }
 
 /* -----------------------------
-   stats row
+   stats
 ------------------------------ */
 .statsRow {
   margin-top: 14px;
@@ -286,7 +284,7 @@
 }
 
 .stat {
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(0, 0, 0, 0.18);
   border-radius: var(--vb-radius-sm);
   padding: 12px;
@@ -323,7 +321,7 @@
 
   padding: 12px;
   border-radius: var(--vb-radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(0, 0, 0, 0.18);
 
   transition: background 160ms ease, border-color 160ms ease;
@@ -340,7 +338,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  min-width: 0; /* allows ellipsis */
+  min-width: 0;
 }
 
 .txIcon {
@@ -390,12 +388,128 @@
 .txAmt.pos { color: var(--vb-good); }
 .txAmt.neg { color: var(--vb-bad); }
 
+/* =====================================================
+   VAULT AI PANEL (matches your TSX)
+===================================================== */
+
+.aiPanel {
+  /* mobile: full width */
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+
+  /* keeps it from becoming tiny */
+  min-height: 420px;
+}
+
+@media (min-width: 860px) {
+  .aiPanel {
+    /* desktop: right column under accounts */
+    grid-column: 2;
+  }
+}
+
+/* chat area */
+.chatBox {
+  flex: 1;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  overflow-y: auto;
+  padding-right: 6px;
+  padding-bottom: 4px;
+}
+
+.chatBox::-webkit-scrollbar {
+  width: 6px;
+}
+.chatBox::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+}
+
+/* bubbles */
+.bubble {
+  max-width: 82%;
+  padding: 12px 14px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+
+  animation: vbFadeIn 0.25s ease;
+}
+
+@keyframes vbFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.bubble.user {
+  align-self: flex-end;
+  background: linear-gradient(
+    135deg,
+    rgba(124, 77, 255, 0.85),
+    rgba(0, 212, 255, 0.35)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 10px 30px rgba(124, 77, 255, 0.25);
+}
+
+.bubble.ai {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+/* input row */
+.chatInputRow {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 6px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.chatInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 15px;
+  padding: 10px 12px;
+}
+
+.chatInput::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.chatInputRow .btn {
+  border-radius: 14px;
+  padding: 10px 16px;
+  font-size: 14px;
+}
+
 /* -----------------------------
    mobile polish
 ------------------------------ */
 @media (max-width: 420px) {
   .dash {
     padding: 14px;
+  }
+
+  .dashInner {
+    min-height: calc(100vh - 28px);
+    padding-top: 8px;
   }
 
   .panel {
@@ -407,7 +521,6 @@
     font-size: 26px;
   }
 
-  /* stack actions full width on tiny screens */
   .dashActions {
     width: 100%;
     justify-content: stretch;
@@ -423,9 +536,6 @@
   }
 }
 
-/* -----------------------------
-   make header wrap nicely on small screens
------------------------------- */
 @media (max-width: 860px) {
   .dashTop {
     flex-direction: column;
