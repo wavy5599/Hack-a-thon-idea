@@ -596,8 +596,6 @@
 
 .aiPanel.overlay .panelTop {
   margin-bottom: 8px;
-  background: rgba(10, 14, 30, 0.72);
-  backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
