@@ -16,7 +16,7 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
   const [remember, setRemember] = useState(true);
   const [showPw, setShowPw] = useState(false);
 
-  const [statusMsg, setStatusMsg] = useState<string>("");
+  const [statusMsg, setStatusMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const validEmail = useMemo(() => {
@@ -26,11 +26,10 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
 
   const validPassword = useMemo(() => password.length >= 6, [password]);
 
-  const canSubmit = useMemo(() => validEmail && validPassword && !isLoading, [
-    validEmail,
-    validPassword,
-    isLoading,
-  ]);
+  const canSubmit = useMemo(
+    () => validEmail && validPassword && !isLoading,
+    [validEmail, validPassword, isLoading]
+  );
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -57,7 +56,6 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
       });
 
       const text = await res.text();
-
       let data: any = {};
       try {
         data = JSON.parse(text);
@@ -71,9 +69,7 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
       setStatusMsg(data?.message ?? "login was successful ✅");
       onSubmit?.(payload);
 
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 300);
+      setTimeout(() => navigate("/dashboard"), 250);
     } catch (err) {
       console.error("❌ fetch failed:", err);
       setStatusMsg("could not reach java server (start it: java VaultBankServer)");
@@ -103,7 +99,7 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
         </header>
 
         <section className="dashGrid">
-          {/* left panel: brand + trust */}
+          {/* left panel */}
           <section className="panel">
             <div className="panelTop">
               <div>
@@ -147,8 +143,8 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
             </div>
           </section>
 
-          {/* right panel: sign in form */}
-          <section className="panel">
+          {/* right panel */}
+          <section className="panel" style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
             <div className="panelTop">
               <div>
                 <div className="kicker">sign in</div>
@@ -198,6 +194,7 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
                     <div className="txIcon" aria-hidden="true">
                       ••
                     </div>
+
                     <div className="txText" style={{ width: "100%" }}>
                       <input
                         style={{
@@ -205,7 +202,6 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
                           border: "none",
                           outline: "none",
                           background: "transparent",
-                          color: "rgba(255,255,255,0.95)",
                           fontSize: 15,
                           padding: "6px 0",
                         }}
@@ -268,41 +264,51 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
               </div>
             </form>
 
-            {/* demo activity box (reusing tx styles) */}
-            <div className="txBox" style={{ marginTop: 14 }}>
+            {/* ✅ demo activity (NO scrollbar, and doesn't stick to bottom) */}
+            <div
+              style={{
+                marginTop: 16,
+                paddingTop: 12,
+                borderTop: "1px solid rgba(255,255,255,0.10)",
+                paddingBottom: 6, // gives a little floor space in the panel
+              }}
+            >
               <div className="kicker">recent activity (demo)</div>
 
-              <div className="txRow" style={{ marginTop: 10 }}>
-                <div className="txLeft">
-                  <div className="txIcon">↗</div>
-                  <div className="txText">
-                    <div className="txMerchant">login attempt</div>
-                    <div className="kicker">device • web</div>
+              {/* no overflow here, so no extra scrollbar */}
+              <div className="txBox" style={{ marginTop: 10 }}>
+                <div className="txRow">
+                  <div className="txLeft">
+                    <div className="txIcon">↗</div>
+                    <div className="txText">
+                      <div className="txMerchant">login attempt</div>
+                      <div className="kicker">device • web</div>
+                    </div>
                   </div>
+                  <div className="txAmt pos">ok</div>
                 </div>
-                <div className="txAmt pos">ok</div>
-              </div>
 
-              <div className="txRow">
-                <div className="txLeft">
-                  <div className="txIcon">🛡</div>
-                  <div className="txText">
-                    <div className="txMerchant">security check</div>
-                    <div className="kicker">token refreshed</div>
+                <div className="txRow">
+                  <div className="txLeft">
+                    <div className="txIcon">🛡</div>
+                    <div className="txText">
+                      <div className="txMerchant">security check</div>
+                      <div className="kicker">token refreshed</div>
+                    </div>
                   </div>
+                  <div className="txAmt pos">done</div>
                 </div>
-                <div className="txAmt pos">done</div>
-              </div>
 
-              <div className="txRow">
-                <div className="txLeft">
-                  <div className="txIcon">⚡</div>
-                  <div className="txText">
-                    <div className="txMerchant">session</div>
-                    <div className="kicker">ready</div>
+                <div className="txRow">
+                  <div className="txLeft">
+                    <div className="txIcon">⚡</div>
+                    <div className="txText">
+                      <div className="txMerchant">session</div>
+                      <div className="kicker">ready</div>
+                    </div>
                   </div>
+                  <div className="txAmt">—</div>
                 </div>
-                <div className="txAmt">—</div>
               </div>
             </div>
           </section>
