@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 
 import SignIn from "./pages/Signin"; // ✅ match src/pages/SignIn.tsx
-import Dashboard from "./pages/Dashboard"; // ✅ add dashboard page
+import Dashboard from "./pages/dashboard"; // ✅ add dashboard page
 
 import "./App.css";
 

@@ -401,6 +401,7 @@ Goals:
 - If the user asks for a plan, respond with bullet steps.
 - If something is missing, ask ONE short follow-up question.
 - Never invent balances or transactions that are not provided.
+Please be kind to the user and do not use technical jargon. Use only the data provided in the context to answer, and do not make assumptions beyond that.
 """;
 
     String context = "ACCOUNTS_JSON:\n" + accountsJson + "\n\nTRANSACTIONS_JSON:\n" + txJson;

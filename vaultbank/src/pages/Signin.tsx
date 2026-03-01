@@ -71,7 +71,6 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
       setStatusMsg(data?.message ?? "login was successful ✅");
       onSubmit?.(payload);
 
-      // ✅ auto-route to dashboard after success
       setTimeout(() => {
         navigate("/dashboard");
       }, 300);
@@ -84,134 +83,196 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
   }
 
   return (
-    <main className="auth">
-      <div className="authShell">
-        <section className="authLeft">
-          <div className="authBrand">
-            <span className="dot" aria-hidden="true" />
-            <div className="brandText">
-              <div className="brandName">{brandName}</div>
-              <div className="brandTag">secure access • clean fintech</div>
-            </div>
+    <main className="dash">
+      <div className="dashInner">
+        <header className="dashTop">
+          <div>
+            <div className="kicker">secure sign in</div>
+            <h1 className="dashH1">welcome back.</h1>
+            <div className="muted">access your vault • demo auth</div>
           </div>
 
-          <h1 className="h1 glow">welcome back.</h1>
-          <p className="lead">
-            sign in to manage balances, track activity, and ship your hackathon demo with a clean,
-            modern UI.
-          </p>
-
-          <div className="authTrust">
-            <div className="stat">
-              <div className="statValue">2FA</div>
-              <div className="statLabel">ready when you are</div>
-            </div>
-            <div className="stat">
-              <div className="statValue">AES-256</div>
-              <div className="statLabel">at-rest encryption</div>
-            </div>
-            <div className="stat">
-              <div className="statValue">99.9%</div>
-              <div className="statLabel">uptime target</div>
-            </div>
+          <div className="dashActions">
+            <button className="btn" type="button" onClick={() => navigate("/")}>
+              home
+            </button>
+            <button className="btn primary" type="button" onClick={() => navigate("/dashboard")}>
+              dashboard
+            </button>
           </div>
+        </header>
 
-          <div className="callout">
-            <div className="callTitle">tip</div>
-            <div className="sub">
-              keep your demo login simple: email + password, then plug in real auth later.
+        <section className="dashGrid">
+          {/* left panel: brand + trust */}
+          <section className="panel">
+            <div className="panelTop">
+              <div>
+                <div className="kicker">brand</div>
+                <div className="balance">{brandName}</div>
+              </div>
+              <span className="pill">secure</span>
             </div>
-          </div>
-        </section>
 
-        <section className="authRight">
-          <div className="panel authPanel">
+            <div className="muted" style={{ marginTop: 6 }}>
+              sign in to manage balances, track activity, and use vault ai.
+            </div>
+
+            <div className="statsRow" style={{ marginTop: 14 }}>
+              <div className="stat">
+                <div className="statValue">2FA</div>
+                <div className="statLabel">ready when you are</div>
+              </div>
+              <div className="stat">
+                <div className="statValue">AES-256</div>
+                <div className="statLabel">at-rest encryption</div>
+              </div>
+              <div className="stat">
+                <div className="statValue">99.9%</div>
+                <div className="statLabel">uptime target</div>
+              </div>
+            </div>
+
+            <div
+              className="stat"
+              style={{
+                marginTop: 14,
+                background: "rgba(0,0,0,0.22)",
+                borderColor: "rgba(255,255,255,0.12)",
+              }}
+            >
+              <div className="kicker">tip</div>
+              <div className="muted" style={{ marginTop: 6 }}>
+                keep your demo login simple: email + password now, real auth later.
+              </div>
+            </div>
+          </section>
+
+          {/* right panel: sign in form */}
+          <section className="panel">
             <div className="panelTop">
               <div>
                 <div className="kicker">sign in</div>
                 <div className="balance">access your vault</div>
               </div>
-              <span className="pill">secure</span>
+              <span className="pill">demo</span>
             </div>
 
-            <form className="authForm" onSubmit={handleSubmit}>
-              <label className="field">
-                <span className="fieldLabel">email</span>
-                <div className="inputGroup">
-                  <span className="fieldIcon" aria-hidden="true">
-                    @
-                  </span>
-                  <input
-                    type="email"
-                    inputMode="email"
-                    autoComplete="email"
-                    placeholder="you@domain.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isLoading}
-                  />
+            <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
+              {/* email */}
+              <label style={{ display: "grid", gap: 6 }}>
+                <span className="kicker">email</span>
+                <div className="acctRow" style={{ padding: 10 }}>
+                  <div className="acctLeft" style={{ width: "100%" }}>
+                    <div className="txIcon" aria-hidden="true">
+                      @
+                    </div>
+                    <div className="txText" style={{ width: "100%" }}>
+                      <input
+                        style={{
+                          width: "100%",
+                          border: "none",
+                          outline: "none",
+                          background: "transparent",
+                          color: "rgba(255,255,255,0.95)",
+                          fontSize: 15,
+                          padding: "6px 0",
+                        }}
+                        type="email"
+                        inputMode="email"
+                        autoComplete="email"
+                        placeholder="you@domain.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
                 </div>
               </label>
 
-              <label className="field">
-                <span className="fieldLabel">password</span>
-                <div className="inputGroup">
-                  <span className="fieldIcon" aria-hidden="true">
-                    ••
-                  </span>
-                  <input
-                    type={showPw ? "text" : "password"}
-                    autoComplete="current-password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={isLoading}
-                  />
-                  <button
-                    type="button"
-                    className="btn ghost miniBtn"
-                    onClick={() => setShowPw((v) => !v)}
-                    aria-label={showPw ? "hide password" : "show password"}
-                    disabled={isLoading}
-                  >
-                    {showPw ? "hide" : "show"}
-                  </button>
+              {/* password */}
+              <label style={{ display: "grid", gap: 6 }}>
+                <span className="kicker">password</span>
+                <div className="acctRow" style={{ padding: 10 }}>
+                  <div className="acctLeft" style={{ width: "100%" }}>
+                    <div className="txIcon" aria-hidden="true">
+                      ••
+                    </div>
+                    <div className="txText" style={{ width: "100%" }}>
+                      <input
+                        style={{
+                          width: "100%",
+                          border: "none",
+                          outline: "none",
+                          background: "transparent",
+                          color: "rgba(255,255,255,0.95)",
+                          fontSize: 15,
+                          padding: "6px 0",
+                        }}
+                        type={showPw ? "text" : "password"}
+                        autoComplete="current-password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={isLoading}
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      className="btn"
+                      style={{ padding: "8px 10px", borderRadius: 12 }}
+                      onClick={() => setShowPw((v) => !v)}
+                      aria-label={showPw ? "hide password" : "show password"}
+                      disabled={isLoading}
+                    >
+                      {showPw ? "hide" : "show"}
+                    </button>
+                  </div>
                 </div>
               </label>
 
-              <div className="authRow">
-                <label className="checkRow">
+              {/* remember row */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <label className="muted" style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <input
                     type="checkbox"
                     checked={remember}
                     onChange={(e) => setRemember(e.target.checked)}
                     disabled={isLoading}
                   />
-                  <span>remember me</span>
+                  remember me
                 </label>
 
-                <a className="mutedLink" href="#">
-                  forgot password?
-                </a>
+                <button
+                  type="button"
+                  className="btn"
+                  style={{ padding: "8px 10px", borderRadius: 12 }}
+                  onClick={() => setStatusMsg("demo: password reset disabled")}
+                  disabled={isLoading}
+                >
+                  forgot?
+                </button>
               </div>
 
-              {statusMsg && <p className="fineprint">{statusMsg}</p>}
+              {statusMsg && <div className="muted">{statusMsg}</div>}
 
-              <div className="panelBtns">
-                <button className="btn primary" type="submit" disabled={!canSubmit}>
+              <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
+                <button className="btn primary" type="submit" disabled={!canSubmit} style={{ flex: 1 }}>
                   {isLoading ? "signing in..." : "sign in"}
                 </button>
               </div>
 
-              <p className="fineprint">
-                by continuing, you agree to our <a href="#">terms</a> and <a href="#">privacy</a>.
-              </p>
+              <div className="muted" style={{ marginTop: 2 }}>
+                by continuing, you agree to our terms and privacy.
+              </div>
             </form>
 
-            <div className="txBox authFoot">
-              <div className="txTitle">recent activity (demo)</div>
+            {/* demo activity box (reusing tx styles) */}
+            <div className="txBox" style={{ marginTop: 14 }}>
+              <div className="kicker">recent activity (demo)</div>
 
-              <div className="txRow">
+              <div className="txRow" style={{ marginTop: 10 }}>
                 <div className="txLeft">
                   <div className="txIcon">↗</div>
                   <div className="txText">
@@ -244,7 +305,7 @@ export default function SignIn({ brandName = "vaultbank", onSubmit }: Props) {
                 <div className="txAmt">—</div>
               </div>
             </div>
-          </div>
+          </section>
         </section>
       </div>
     </main>

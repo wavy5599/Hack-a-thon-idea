@@ -16,7 +16,8 @@
   min-height: 100vh;
   width: 100%;
   margin: 0;
-
+  margin-top: 10px;
+  border-radius: 10px;
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
     "Apple Color Emoji", "Segoe UI Emoji";
   color: rgba(255, 255, 255, 0.92);
@@ -86,13 +87,19 @@
   width: 100%;
   max-width: 1120px;
   margin: 0 auto;
-
-  min-height: calc(100vh - 36px); /* 18 top + 18 bottom padding */
+  min-height: 0;
+  padding-top: 10px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+}
 
-  padding-top: 10px;
+@media (min-width: 860px) {
+  .balancePanel { grid-column: 1; grid-row: 1; }
+  .txPanel      { grid-column: 1; grid-row: 2; }
+
+  .accountsPanel{ grid-column: 2; grid-row: 1; }
+  .aiPanel      { grid-column: 2; grid-row: 2; }
 }
 
 /* -----------------------------
@@ -156,7 +163,6 @@
   background: var(--vb-bg-card);
   border: 1px solid var(--vb-border);
   border-radius: var(--vb-radius);
-  box-shadow: var(--vb-shadow);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   padding: 16px;
@@ -392,14 +398,21 @@
    VAULT AI PANEL (matches your TSX)
 ===================================================== */
 
+/* ✅ FIXED: cap height + allow scrolling in chatBox (prevents panel expanding forever) */
 .aiPanel {
   /* mobile: full width */
   grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
 
-  /* keeps it from becoming tiny */
-  min-height: 420px;
+  /* cap overall panel height so chat can scroll */
+  height: clamp(360px, 55vh, 520px);
+
+  /* important for flex/overflow layouts */
+  min-height: 0;
+
+  /* prevent inner content from forcing growth */
+  overflow: hidden;
 }
 
 @media (min-width: 860px) {
@@ -407,6 +420,13 @@
     /* desktop: right column under accounts */
     grid-column: 2;
   }
+}
+
+/* ✅ added: prevent flex children from forcing horizontal overflow */
+.aiPanel,
+.chatBox,
+.bubble {
+  min-width: 0;
 }
 
 /* chat area */
@@ -417,7 +437,11 @@
   flex-direction: column;
   gap: 12px;
 
+  /* ✅ key: allow it to shrink and scroll */
+  min-height: 0;
+
   overflow-y: auto;
+  overflow-x: hidden; /* ✅ prevents sideways stretching/scroll */
   padding-right: 6px;
   padding-bottom: 4px;
 }
@@ -433,11 +457,16 @@
 /* bubbles */
 .bubble {
   max-width: 82%;
+  width: fit-content; /* ✅ bubble sizes to content, not container width */
   padding: 12px 14px;
   border-radius: 16px;
   font-size: 14px;
   line-height: 1.5;
   white-space: pre-wrap;
+
+  /* ✅ safety for long strings/urls */
+  word-break: break-word;
+  overflow-wrap: anywhere;
 
   animation: vbFadeIn 0.25s ease;
 }
