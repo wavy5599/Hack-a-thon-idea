@@ -1,10 +1,10 @@
 /* src/pages/dashboard.css
    self-contained dashboard styles (scoped to .dash only)
-   matches Dashboard.tsx including vault ai panel
+   matches Dashboard.tsx including vault ai panel + decision card + transfer modal
 */
 
 /* -----------------------------
-   scoped reset (only inside .dash)
+   scoped reset
 ------------------------------ */
 .dash,
 .dash * {
@@ -16,12 +16,13 @@
   width: 100%;
   margin: 0;
   margin-top: 10px;
-  border-radius: 10px;
+  border-radius: 12px;
+
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
     "Apple Color Emoji", "Segoe UI Emoji";
+
   color: rgba(255, 255, 255, 0.92);
   line-height: 1.35;
-
   padding: 18px;
 
   background:
@@ -32,10 +33,10 @@
 
   overflow-x: hidden;
 
-  /* scoped tokens */
+  /* tokens */
   --vb-bg-card: rgba(255, 255, 255, 0.06);
   --vb-border: rgba(255, 255, 255, 0.12);
-  --vb-border-2: rgba(255, 255, 255, 0.16);
+  --vb-border-2: rgba(255, 255, 255, 0.18);
   --vb-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
 
   --vb-muted: rgba(255, 255, 255, 0.72);
@@ -93,14 +94,6 @@
   justify-content: flex-start;
 }
 
-@media (min-width: 860px) {
-  .balancePanel { grid-column: 1; grid-row: 1; }
-  .txPanel      { grid-column: 1; grid-row: 2; }
-
-  .accountsPanel{ grid-column: 2; grid-row: 1; }
-  .aiPanel      { grid-column: 2; grid-row: 2; }
-}
-
 /* -----------------------------
    header
 ------------------------------ */
@@ -153,6 +146,24 @@
     grid-template-columns: 1.05fr 0.95fr;
     gap: 16px;
   }
+
+  /* explicit placement (matches your TSX intent) */
+  .balancePanel {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .txPanel {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .accountsPanel {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .aiPanel {
+    grid-column: 2;
+    grid-row: 2;
+  }
 }
 
 /* -----------------------------
@@ -166,6 +177,7 @@
   -webkit-backdrop-filter: blur(14px);
   padding: 16px;
   margin-top: 6px;
+  box-shadow: 0 12px 44px rgba(0, 0, 0, 0.28);
 }
 
 .panelTop {
@@ -212,13 +224,21 @@
 }
 
 @keyframes vbSheen {
-  0% { transform: translateX(-120%); }
-  60% { transform: translateX(120%); }
-  100% { transform: translateX(120%); }
+  0% {
+    transform: translateX(-120%);
+  }
+  60% {
+    transform: translateX(120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pill::after { animation: none; }
+  .pill::after {
+    animation: none;
+  }
 }
 
 /* -----------------------------
@@ -255,21 +275,20 @@
 
 .btn.primary {
   border-color: rgba(124, 77, 255, 0.35);
-  background: linear-gradient(
-    135deg,
-    rgba(124, 77, 255, 0.66),
-    rgba(0, 212, 255, 0.26)
-  );
+  background: linear-gradient(135deg, rgba(124, 77, 255, 0.66), rgba(0, 212, 255, 0.26));
   box-shadow: 0 16px 46px rgba(124, 77, 255, 0.16);
 }
 
 .btn.primary:hover {
   border-color: rgba(0, 212, 255, 0.35);
-  background: linear-gradient(
-    135deg,
-    rgba(124, 77, 255, 0.74),
-    rgba(0, 212, 255, 0.34)
-  );
+  background: linear-gradient(135deg, rgba(124, 77, 255, 0.74), rgba(0, 212, 255, 0.34));
+}
+
+.btn.mini {
+  padding: 8px 10px;
+  font-size: 12px;
+  border-radius: 12px;
+  opacity: 0.95;
 }
 
 /* -----------------------------
@@ -354,11 +373,7 @@
   place-items: center;
   border-radius: 12px;
 
-  background: linear-gradient(
-    135deg,
-    rgba(124, 77, 255, 0.18),
-    rgba(0, 212, 255, 0.10)
-  );
+  background: linear-gradient(135deg, rgba(124, 77, 255, 0.18), rgba(0, 212, 255, 0.1));
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
 }
@@ -390,57 +405,65 @@
   white-space: nowrap;
 }
 
-.txAmt.pos { color: var(--vb-good); }
-.txAmt.neg { color: var(--vb-bad); }
+.txAmt.pos {
+  color: var(--vb-good);
+}
+.txAmt.neg {
+  color: var(--vb-bad);
+}
 
 /* =====================================================
-   VAULT AI PANEL (matches your TSX)
+   AI PANEL (normal in-grid)
 ===================================================== */
 
-/* ✅ FIXED: cap height + allow scrolling in chatBox (prevents panel expanding forever) */
 .aiPanel {
-  /* mobile: full width */
   grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
 
-  /* cap overall panel height so chat can scroll */
   height: clamp(360px, 55vh, 520px);
-
-  /* important for flex/overflow layouts */
   min-height: 0;
-
-  /* prevent inner content from forcing growth */
   overflow: hidden;
 }
 
 @media (min-width: 860px) {
   .aiPanel {
-    /* desktop: right column under accounts */
     grid-column: 2;
   }
 }
 
-/* ✅ added: prevent flex children from forcing horizontal overflow */
+/* prevent flex children from forcing overflow */
 .aiPanel,
 .chatBox,
 .bubble {
   min-width: 0;
 }
 
-/* chat area */
+.aiTopActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* minimized state (tsx hides inner) */
+.aiPanel.min {
+  height: auto;
+  overflow: visible;
+}
+
+/* chat */
 .chatBox {
-  flex: 1;
+  flex: 1 1 auto;
   margin-top: 14px;
+
   display: flex;
   flex-direction: column;
   gap: 12px;
 
-  /* ✅ key: allow it to shrink and scroll */
   min-height: 0;
-
   overflow-y: auto;
-  overflow-x: hidden; /* ✅ prevents sideways stretching/scroll */
+  overflow-x: hidden;
+
   padding-right: 6px;
   padding-bottom: 4px;
 }
@@ -456,32 +479,34 @@
 /* bubbles */
 .bubble {
   max-width: 82%;
-  width: fit-content; /* ✅ bubble sizes to content, not container width */
+  width: fit-content;
+
   padding: 12px 14px;
   border-radius: 16px;
   font-size: 14px;
   line-height: 1.5;
   white-space: pre-wrap;
 
-  /* ✅ safety for long strings/urls */
   word-break: break-word;
   overflow-wrap: anywhere;
 
-  animation: vbFadeIn 0.25s ease;
+  animation: vbFadeIn 0.2s ease;
 }
 
 @keyframes vbFadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .bubble.user {
   align-self: flex-end;
-  background: linear-gradient(
-    135deg,
-    rgba(124, 77, 255, 0.85),
-    rgba(0, 212, 255, 0.35)
-  );
+  background: linear-gradient(135deg, rgba(124, 77, 255, 0.85), rgba(0, 212, 255, 0.35));
   border: 1px solid rgba(255, 255, 255, 0.22);
   box-shadow: 0 10px 30px rgba(124, 77, 255, 0.25);
 }
@@ -526,37 +551,105 @@
   padding: 10px 16px;
   font-size: 14px;
 }
-/* ✅ add this to dashboard.css (bottom is fine) */
+
+/* demo row */
+.demoRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+/* =====================================================
+   FULLSCREEN OVERLAY (for the overlay approach)
+   NOTE: this requires TSX that renders <div className="aiOverlay"> ... aiPanel.overlay ...
+===================================================== */
+
+.aiOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.58);
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+/* centered fullscreen card */
+.aiPanel.overlay {
+  width: min(1100px, 96vw);
+  height: min(86vh, 920px);
+  margin: 0;
+
+  border-radius: 20px;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+
+  /* make it feel premium */
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.05));
+  box-shadow: 0 30px 120px rgba(0, 0, 0, 0.6);
+}
+
+.aiPanel.overlay .panelTop {
+  margin-bottom: 8px;
+  background: rgba(10, 14, 30, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.aiPanel.overlay .chatBox {
+  flex: 1;
+  min-height: 0;
+  margin-top: 10px;
+}
+
+.aiPanel.overlay .chatInputRow {
+  background: rgba(10, 14, 30, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.aiPanel.overlay .bubble {
+  max-width: 860px; /* feels better in fullscreen */
+}
+
+/* =====================================================
+   DECISION CARD
+===================================================== */
 
 .decisionWrap {
   display: grid;
   gap: 10px;
 }
+
 .bubbleText {
   opacity: 0.95;
 }
 
-/* big card */
 .decisionCard {
   border-radius: 18px;
   padding: 14px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
-  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(10px);
 }
 
 .decisionCard.green {
   border-color: rgba(0, 255, 170, 0.25);
-  box-shadow: 0 12px 30px rgba(0,255,170,0.08);
+  box-shadow: 0 12px 30px rgba(0, 255, 170, 0.08);
 }
 .decisionCard.yellow {
   border-color: rgba(255, 208, 0, 0.25);
-  box-shadow: 0 12px 30px rgba(255,208,0,0.08);
+  box-shadow: 0 12px 30px rgba(255, 208, 0, 0.08);
 }
 .decisionCard.red {
   border-color: rgba(255, 80, 120, 0.28);
-  box-shadow: 0 12px 30px rgba(255,80,120,0.10);
+  box-shadow: 0 12px 30px rgba(255, 80, 120, 0.1);
 }
 
 .decisionTop {
@@ -577,14 +670,23 @@
   font-size: 12px;
   padding: 6px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.14);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   text-transform: lowercase;
   letter-spacing: 0.2px;
   white-space: nowrap;
 }
-.riskChip.green { background: rgba(0,255,170,0.10); border-color: rgba(0,255,170,0.25); }
-.riskChip.yellow { background: rgba(255,208,0,0.10); border-color: rgba(255,208,0,0.25); }
-.riskChip.red { background: rgba(255,80,120,0.10); border-color: rgba(255,80,120,0.28); }
+.riskChip.green {
+  background: rgba(0, 255, 170, 0.1);
+  border-color: rgba(0, 255, 170, 0.25);
+}
+.riskChip.yellow {
+  background: rgba(255, 208, 0, 0.1);
+  border-color: rgba(255, 208, 0, 0.25);
+}
+.riskChip.red {
+  background: rgba(255, 80, 120, 0.1);
+  border-color: rgba(255, 80, 120, 0.28);
+}
 
 .whyRow {
   display: grid;
@@ -592,18 +694,20 @@
   margin-top: 10px;
   margin-bottom: 10px;
 }
+
 .whyItem {
   display: flex;
   gap: 10px;
   align-items: flex-start;
   opacity: 0.95;
 }
+
 .whyDot {
   width: 8px;
   height: 8px;
   border-radius: 999px;
   margin-top: 6px;
-  background: rgba(255,255,255,0.55);
+  background: rgba(255, 255, 255, 0.55);
 }
 
 .actionsRow {
@@ -611,15 +715,20 @@
   gap: 10px;
   grid-template-columns: 1fr;
 }
+
 @media (min-width: 1100px) {
-  .actionsRow { grid-template-columns: 1fr 1fr; }
+  .actionsRow {
+    grid-template-columns: 1fr 1fr;
+  }
 }
+
 .actionBox {
   border-radius: 14px;
   padding: 10px 12px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
 }
+
 .actionText {
   margin-top: 4px;
   font-weight: 600;
@@ -632,21 +741,27 @@
   gap: 10px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+
 @media (min-width: 1100px) {
-  .metricsGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .metricsGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
+
 .metric {
   border-radius: 14px;
   padding: 10px 12px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
 }
+
 .metricLabel {
   font-size: 11px;
   opacity: 0.75;
   text-transform: lowercase;
   letter-spacing: 0.2px;
 }
+
 .metricValue {
   margin-top: 3px;
   font-size: 14px;
@@ -660,41 +775,27 @@
   padding: 4px 10px;
   border-radius: 999px;
   font-size: 12px;
-  border: 1px solid rgba(255,255,255,0.16);
+  border: 1px solid rgba(255, 255, 255, 0.16);
 }
+
 .spikePill.on {
-  background: rgba(255,80,120,0.12);
-  border-color: rgba(255,80,120,0.28);
+  background: rgba(255, 80, 120, 0.12);
+  border-color: rgba(255, 80, 120, 0.28);
 }
+
 .spikePill.off {
-  background: rgba(0,255,170,0.10);
-  border-color: rgba(0,255,170,0.22);
+  background: rgba(0, 255, 170, 0.1);
+  border-color: rgba(0, 255, 170, 0.22);
 }
 
-/* demo quick buttons */
-.demoRow {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-  flex-wrap: wrap;
-}
-.btn.mini {
-  padding: 8px 10px;
-  font-size: 12px;
-  border-radius: 12px;
-  opacity: 0.95;
-}
-.btn.mini:hover {
-  transform: translateY(-1px);
-}
+/* =====================================================
+   MODAL (transfer)
+===================================================== */
 
-/* ✅ add these to dashboard.css (keep your existing decision card CSS too) */
-
-/* modal */
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.55);
+  background: rgba(0, 0, 0, 0.55);
   display: grid;
   place-items: center;
   padding: 18px;
@@ -704,9 +805,9 @@
 .modalCard {
   width: min(720px, 96vw);
   border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
-  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(12px);
   padding: 14px;
 }
@@ -746,21 +847,21 @@
   width: 100%;
   border-radius: 14px;
   padding: 10px 12px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(0,0,0,0.20);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.2);
   color: inherit;
   outline: none;
 }
 
 .fieldInput:focus {
-  border-color: rgba(255,255,255,0.22);
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 .modalErr {
   border-radius: 14px;
   padding: 10px 12px;
-  border: 1px solid rgba(255,80,120,0.25);
-  background: rgba(255,80,120,0.10);
+  border: 1px solid rgba(255, 80, 120, 0.25);
+  background: rgba(255, 80, 120, 0.1);
   font-weight: 700;
 }
 
@@ -776,19 +877,12 @@
   margin-left: auto;
 }
 
-
-
 /* -----------------------------
    mobile polish
 ------------------------------ */
 @media (max-width: 420px) {
   .dash {
     padding: 14px;
-  }
-
-  .dashInner {
-    min-height: calc(100vh - 28px);
-    padding-top: 8px;
   }
 
   .panel {
@@ -800,9 +894,14 @@
     font-size: 26px;
   }
 
+  .dashTop {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .dashActions {
     width: 100%;
-    justify-content: stretch;
+    justify-content: flex-start;
   }
 
   .dashActions .btn {
@@ -813,15 +912,14 @@
   .txRow {
     padding: 11px;
   }
-}
 
-@media (max-width: 860px) {
-  .dashTop {
-    flex-direction: column;
-    align-items: stretch;
+  .aiOverlay {
+    padding: 12px;
   }
 
-  .dashActions {
-    justify-content: flex-start;
+  .aiPanel.overlay {
+    width: calc(100vw - 24px);
+    height: calc(100vh - 24px);
+    border-radius: 18px;
   }
 }

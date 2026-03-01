@@ -4,6 +4,10 @@
 // - supports new backend shape: { ok:true, decision:{...} } OR { ok:true, reply:"..." }
 // - still supports legacy shape where decision JSON came back inside reply string
 // - transfer UI ledger uses non-stale account names (captures before refresh)
+// NEW:
+// - AI panel can be minimized + fullscreen (maximize) with ESC to exit fullscreen
+// - fullscreen uses aiOverlay + aiPanel.overlay (matches the new CSS)
+// - fullscreen locks body scroll + focuses input + click-outside closes
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./dashboard.css";
@@ -179,6 +183,42 @@ export default function Dashboard() {
   const [input, setInput] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const chatInputRef = useRef<HTMLInputElement | null>(null);
+
+  // AI panel view states
+  const [aiMinimized, setAiMinimized] = useState(false);
+  const [aiMaximized, setAiMaximized] = useState(false);
+
+  function openAiMax() {
+    setAiMinimized(false);
+    setAiMaximized(true);
+  }
+  function closeAiMax() {
+    setAiMaximized(false);
+  }
+
+  // ESC closes fullscreen + lock body scroll while fullscreen
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setAiMaximized(false);
+    }
+
+    if (aiMaximized) {
+      window.addEventListener("keydown", onKeyDown);
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+
+      // focus input so it feels like a real fullscreen chat
+      setTimeout(() => chatInputRef.current?.focus(), 0);
+
+      return () => {
+        window.removeEventListener("keydown", onKeyDown);
+        document.body.style.overflow = prev;
+      };
+    }
+
+    return () => {};
+  }, [aiMaximized]);
 
   // transfer UI
   const [transferOpen, setTransferOpen] = useState(false);
@@ -232,12 +272,15 @@ export default function Dashboard() {
   }, [accounts, tFrom, tTo]);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, aiLoading]);
+    if (!aiMinimized) chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, aiLoading, aiMinimized]);
 
   async function sendAi(withText?: string) {
     const msg = (withText ?? input).trim();
     if (!msg || aiLoading) return;
+
+    // auto-open AI if minimized so user sees response
+    if (aiMinimized) setAiMinimized(false);
 
     setInput("");
     setMessages((prev) => [...prev, { id: mkId(), role: "user", text: msg }]);
@@ -259,7 +302,7 @@ export default function Dashboard() {
         return;
       }
 
-      // ✅ NEW BACKEND: decision is an object field
+      // NEW BACKEND: decision is an object field
       if (isDecisionLike(data.decision)) {
         const d = data.decision as DecisionReply;
         setMessages((prev) => [
@@ -269,10 +312,10 @@ export default function Dashboard() {
         return;
       }
 
-      // ✅ NORMAL: reply is a string
+      // NORMAL: reply is a string
       const rawReply = String(data.reply ?? "");
 
-      // ✅ LEGACY BACKEND: decision JSON might be inside reply string
+      // LEGACY: decision JSON might be inside reply string
       const legacyDecision = tryParseDecision(rawReply);
       if (legacyDecision) {
         setMessages((prev) => [
@@ -292,6 +335,7 @@ export default function Dashboard() {
       setMessages((prev) => [...prev, { id: mkId(), role: "ai", text: "could not reach server." }]);
     } finally {
       setAiLoading(false);
+      setTimeout(() => chatInputRef.current?.focus(), 0);
     }
   }
 
@@ -360,6 +404,111 @@ export default function Dashboard() {
       setTLoading(false);
     }
   }
+
+  // click outside the fullscreen card closes it
+  function onAiOverlayMouseDown(e: React.MouseEvent<HTMLElement>) {
+    if (e.target === e.currentTarget) closeAiMax();
+  }
+
+  // render AI panel once, reuse it in-grid or in overlay
+  const aiPanel = (
+    <section className={`panel aiPanel ${aiMinimized ? "min" : ""} ${aiMaximized ? "overlay" : ""}`}>
+      <div className="panelTop">
+        <div>
+          <div className="kicker">vault ai</div>
+          <div className="balance">fintech copilot</div>
+        </div>
+
+        <div className="aiTopActions">
+          <button
+            className="btn mini"
+            type="button"
+            onClick={() => setAiMinimized((v) => !v)}
+            disabled={aiLoading}
+            title={aiMinimized ? "expand" : "minimize"}
+          >
+            {aiMinimized ? "expand" : "minimize"}
+          </button>
+
+          <button
+            className="btn mini"
+            type="button"
+            onClick={() => (aiMaximized ? closeAiMax() : openAiMax())}
+            disabled={aiLoading}
+            title={aiMaximized ? "exit fullscreen" : "fullscreen"}
+          >
+            {aiMaximized ? "exit" : "fullscreen"}
+          </button>
+
+          <span className="pill">beta</span>
+        </div>
+      </div>
+
+      {!aiMinimized && (
+        <>
+          <div className="chatBox" aria-live="polite">
+            {messages.map((m) => (
+              <div key={m.id} className={`bubble ${m.role}`}>
+                {"decision" in m && m.decision ? (
+                  <div className="decisionWrap">
+                    <div className="bubbleText">{m.text}</div>
+                    <DecisionCard d={m.decision} />
+                  </div>
+                ) : (
+                  m.text
+                )}
+              </div>
+            ))}
+            {aiLoading && <div className="bubble ai">thinking...</div>}
+            <div ref={chatEndRef} />
+          </div>
+
+          <div className="chatInputRow">
+            <input
+              ref={chatInputRef}
+              className="chatInput"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder='try: "$180 bar weekend" or "should i buy a $90 hoodie?"'
+              onKeyDown={(e) => {
+                if (e.key === "Enter") sendAi();
+              }}
+              disabled={aiLoading}
+            />
+            <button className="btn primary" type="button" onClick={() => sendAi()} disabled={aiLoading}>
+              send
+            </button>
+          </div>
+
+          <div className="demoRow">
+            <button className="btn mini" type="button" onClick={() => sendAi("$180 bar weekend")} disabled={aiLoading}>
+              demo: nightlife
+            </button>
+            <button className="btn mini" type="button" onClick={() => sendAi("$64 doordash tonight")} disabled={aiLoading}>
+              demo: doordash
+            </button>
+            <button
+              className="btn mini"
+              type="button"
+              onClick={() => sendAi("should i spend $200 on a new keyboard")}
+              disabled={aiLoading}
+            >
+              demo: shopping
+            </button>
+            <button className="btn mini" type="button" onClick={() => setTransferOpen(true)} disabled={aiLoading}>
+              demo: transfer
+            </button>
+          </div>
+        </>
+      )}
+
+      {aiMinimized && (
+        <div className="muted" style={{ marginTop: 10 }}>
+          ai minimized — click <b>expand</b> to open chat
+        </div>
+      )}
+    </section>
+  );
 
   return (
     <main className="dash">
@@ -504,70 +653,16 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* AI */}
-            <section className="panel aiPanel">
-              <div className="panelTop">
-                <div>
-                  <div className="kicker">vault ai</div>
-                  <div className="balance">fintech copilot</div>
-                </div>
-                <span className="pill">beta</span>
-              </div>
-
-              <div className="chatBox" aria-live="polite">
-                {messages.map((m) => (
-                  <div key={m.id} className={`bubble ${m.role}`}>
-                    {"decision" in m && m.decision ? (
-                      <div className="decisionWrap">
-                        <div className="bubbleText">{m.text}</div>
-                        <DecisionCard d={m.decision} />
-                      </div>
-                    ) : (
-                      m.text
-                    )}
-                  </div>
-                ))}
-                {aiLoading && <div className="bubble ai">thinking...</div>}
-                <div ref={chatEndRef} />
-              </div>
-
-              <div className="chatInputRow">
-                <input
-                  className="chatInput"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder='try: "$180 bar weekend" or "should i buy a $90 hoodie?"'
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") sendAi();
-                  }}
-                  disabled={aiLoading}
-                />
-                <button className="btn primary" type="button" onClick={() => sendAi()} disabled={aiLoading}>
-                  send
-                </button>
-              </div>
-
-              <div className="demoRow">
-                <button className="btn mini" type="button" onClick={() => sendAi("$180 bar weekend")} disabled={aiLoading}>
-                  demo: nightlife
-                </button>
-                <button className="btn mini" type="button" onClick={() => sendAi("$64 doordash tonight")} disabled={aiLoading}>
-                  demo: doordash
-                </button>
-                <button
-                  className="btn mini"
-                  type="button"
-                  onClick={() => sendAi("should i spend $200 on a new keyboard")}
-                  disabled={aiLoading}
-                >
-                  demo: shopping
-                </button>
-                <button className="btn mini" type="button" onClick={() => setTransferOpen(true)} disabled={aiLoading}>
-                  demo: transfer
-                </button>
-              </div>
-            </section>
+            {/* AI in-grid */}
+            {!aiMaximized && aiPanel}
           </section>
+        )}
+
+        {/* AI FULLSCREEN OVERLAY */}
+        {aiMaximized && (
+          <div className="aiOverlay" onMouseDown={onAiOverlayMouseDown} role="dialog" aria-modal="true">
+            {aiPanel}
+          </div>
         )}
 
         {/* TRANSFER MODAL */}
